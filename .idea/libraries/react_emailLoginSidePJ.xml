@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="react-emailLoginSidePJ">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/react-emailLoginSidePJUtil/react-emailLoginSidePJ.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
