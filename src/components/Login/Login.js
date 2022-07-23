@@ -11,6 +11,13 @@ const Login = (props) => {
 	const [passwordIsValid, setPasswordIsValid] = useState();
 	const [formIsValid, setFormIsValid] = useState(false);
 
+	useEffect(()=>{
+		console.log('effect running')
+		return ()=> {
+			console.log('effect cleanup');
+		}
+	}, [])
+
 	useEffect(() => {
 		const identifier = setTimeout(() => {
 			console.log('유효성 식별 검사')
