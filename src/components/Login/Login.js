@@ -1,19 +1,43 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useReducer} from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
 import Button from '../UI/Button/Button';
 
+const emailReducer = (state, action) => { //최신 스냅샷 state, dispatch 된 action
+	if (action.type === 'USER_INPUT') {
+		return {value: action.val, isValid: action.val.includes('@')}
+	}
+	if(action.type === 'USER_BLUR'){
+		return {value: state.value, isValid: state.value.includes('@')}
+	}
+		return {value: '', isValid: false}
+}
+
+const passwordReducer = (state, action) => {
+	if(action.type === 'USER_INPUT'){
+		return {value: action.val, isValid: action.val.trim().length > 6}
+	}
+	if (action.type === 'INPUT_BLUR'){
+		return {value: state.value, isValid: state.value.trim().length > 6}
+	}
+	return {value: '', isValid: false}
+}
+
 const Login = (props) => {
-	const [enteredEmail, setEnteredEmail] = useState('');
-	const [emailIsValid, setEmailIsValid] = useState();
-	const [enteredPassword, setEnteredPassword] = useState('');
-	const [passwordIsValid, setPasswordIsValid] = useState();
+	/*const [enteredEmail, setEnteredEmail] = useState('');
+	const [emailIsValid, setEmailIsValid] = useState();*/
+	/*const [enteredPassword, setEnteredPassword] = useState('');
+	const [passwordIsValid, setPasswordIsValid] = useState();*/
 	const [formIsValid, setFormIsValid] = useState(false);
 
-	useEffect(()=>{
+	//인수로 reducerFn 과 초기 state 설정
+	const [emailState, dispatchEmail] = useReducer(emailReducer, {value: '', isValid: null,})
+	const [passwordState, dispatchPassword] = useReducer(passwordReducer, {value: '', isValid: null})
+
+	/*useEffect(() => {
 		console.log('effect running')
-		return ()=> {
+		return () => {
 			console.log('effect cleanup');
 		}
 	}, [])
@@ -23,39 +47,51 @@ const Login = (props) => {
 			console.log('유효성 식별 검사')
 			//이메일에 @ 가 포함되어야하며 입력된 비밀번호가 정확한지 체크 및 입력 이메일또는 비번이 변경될때 업데이트
 			setFormIsValid(
-					enteredEmail.includes('@') && enteredPassword.trim().length > 6);
+					emailState.value.includes('@') && passwordState.value.trim().length > 6);
 		}, 500) // 0.5초 딜레이
 		return () => {
 			console.log('clean up')
 			clearTimeout(identifier) // 타이머 초기화
 
 		}
-	}, [enteredEmail, enteredPassword])
+	}, [emailState, passwordState])*/
 
 	const emailChangeHandler = (event) => {
-		setEnteredEmail(event.target.value);
+		dispatchEmail({
+			type: 'USER_INPUT',
+			val: event.target.value,
+		});
 	};
 
 	const passwordChangeHandler = (event) => {
-		setEnteredPassword(event.target.value);
+		dispatchPassword({
+			type: 'USER_INPUT',
+			val: event.target.value,
+		});
 
 		//비밀번호가 6자리 이상인지 @가 포함되어있는지
 		setFormIsValid(
-				event.target.value.trim().length > 6 && enteredEmail.includes('@')
+				passwordState.isValid && emailState.isValid
 		);
 	};
 
 	const validateEmailHandler = () => {
-		setEmailIsValid(enteredEmail.includes('@'));
+		//setEmailIsValid(emailState.isValid.includes('@'));
+		dispatchEmail({
+			type: 'INPUT_BLUR',
+		})
 	};
 
 	const validatePasswordHandler = () => {
-		setPasswordIsValid(enteredPassword.trim().length > 6);
+		//setPasswordIsValid(passwordState.value.trim().length > 6);
+		dispatchPassword({
+			type: 'USER_BLUR',
+		})
 	};
 
 	const submitHandler = (event) => {
 		event.preventDefault();
-		props.onLogin(enteredEmail, enteredPassword);
+		props.onLogin(emailState.value, passwordState.value);
 	};
 
 	return (
@@ -63,28 +99,28 @@ const Login = (props) => {
 				<form onSubmit={submitHandler}>
 					<div
 							className={`${classes.control} ${
-									emailIsValid === false ? classes.invalid : ''
+									emailState.isValid === false ? classes.invalid : ''
 							}`}
 					>
 						<label htmlFor="email">E-Mail</label>
 						<input
 								type="email"
 								id="email"
-								value={enteredEmail}
+								value={emailState.value}
 								onChange={emailChangeHandler}
 								onBlur={validateEmailHandler}
 						/>
 					</div>
 					<div
 							className={`${classes.control} ${
-									passwordIsValid === false ? classes.invalid : ''
+									passwordState.isValid === false ? classes.invalid : ''
 							}`}
 					>
 						<label htmlFor="password">Password</label>
 						<input
 								type="password"
 								id="password"
-								value={enteredPassword}
+								value={passwordState.value}
 								onChange={passwordChangeHandler}
 								onBlur={validatePasswordHandler}
 						/>
