@@ -40,30 +40,39 @@ const Login = (props) => {
 		return () => {
 			console.log('effect cleanup');
 		}
-	}, [])
+	}, [])*/
 
-	useEffect(() => {
+	// 객체 디스트럭쳐링으로 emailState 에서 isValid 속성을 가져왔고 유효성 검사를 하지않을땐 useEffect 가 실행되지않음
+	const {isValid: emailIsValid } = emailState;
+	const {isValid: passwordIsValid} = passwordState;
+
+	useEffect(() => { // 다른 state 를 기준으로 state 를 update 하는 좋은 방법
 		const identifier = setTimeout(() => {
 			console.log('유효성 식별 검사')
 			//이메일에 @ 가 포함되어야하며 입력된 비밀번호가 정확한지 체크 및 입력 이메일또는 비번이 변경될때 업데이트
-			setFormIsValid(
-					emailState.value.includes('@') && passwordState.value.trim().length > 6);
+			setFormIsValid( // setFormIsValid 가 useEffect 안에있기때문에 여전히 state 스냅샷을 참조한다
+					emailState.isValid && passwordState.isValid)
 		}, 500) // 0.5초 딜레이
 		return () => {
 			console.log('clean up')
 			clearTimeout(identifier) // 타이머 초기화
 
 		}
-	}, [emailState, passwordState])*/
+	}, [emailIsValid, passwordIsValid])
 
 	const emailChangeHandler = (event) => {
 		dispatchEmail({
 			type: 'USER_INPUT',
 			val: event.target.value,
 		});
+
+		setFormIsValid(
+				event.target.value.includes('@') && passwordState.isValid
+		)
 	};
 
 	const passwordChangeHandler = (event) => {
+		// 비밀번호가 변경될때 dispatchPassword 호출
 		dispatchPassword({
 			type: 'USER_INPUT',
 			val: event.target.value,
@@ -71,7 +80,7 @@ const Login = (props) => {
 
 		//비밀번호가 6자리 이상인지 @가 포함되어있는지
 		setFormIsValid(
-				passwordState.isValid && emailState.isValid
+				event.target.value.trim().length > 6 && emailState.isValid
 		);
 	};
 
