@@ -1,8 +1,9 @@
-import React, {useState, useEffect, useReducer} from 'react';
+import React, {useState, useEffect, useReducer, useContext} from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
 import Button from '../UI/Button/Button';
+import AuthContext from "../../Store/auth-context";
 
 const emailReducer = (state, action) => { //최신 스냅샷 state, dispatch 된 action
 	if (action.type === 'USER_INPUT') {
@@ -24,7 +25,7 @@ const passwordReducer = (state, action) => {
 	return {value: '', isValid: false}
 }
 
-const Login = (props) => {
+const Login = () => {
 	/*const [enteredEmail, setEnteredEmail] = useState('');
 	const [emailIsValid, setEmailIsValid] = useState();*/
 	/*const [enteredPassword, setEnteredPassword] = useState('');
@@ -34,6 +35,8 @@ const Login = (props) => {
 	//인수로 reducerFn 과 초기 state 설정
 	const [emailState, dispatchEmail] = useReducer(emailReducer, {value: '', isValid: null,})
 	const [passwordState, dispatchPassword] = useReducer(passwordReducer, {value: '', isValid: null})
+
+	const contextLogInOut = useContext(AuthContext)
 
 	/*useEffect(() => {
 		console.log('effect running')
@@ -100,7 +103,7 @@ const Login = (props) => {
 
 	const submitHandler = (event) => {
 		event.preventDefault();
-		props.onLogin(emailState.value, passwordState.value);
+		contextLogInOut.onLogin(emailState.value, passwordState.value);
 	};
 
 	return (
@@ -130,6 +133,7 @@ const Login = (props) => {
 								type="password"
 								id="password"
 								value={passwordState.value}
+								autoComplete="on"
 								onChange={passwordChangeHandler}
 								onBlur={validatePasswordHandler}
 						/>
