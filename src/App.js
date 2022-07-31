@@ -33,8 +33,9 @@ function App() {
 			* */
 			<AuthContext.Provider value={{ /*객체 전달 가능하며 해당 객체를 변경 할 수 있다 ex) state 나 앱컴포넌트를 통해 변경경될때마다 새 값이 모든 소비 컴포넌트에 전달됨*/
 				isLoggedIn: isLoggedIn, /*value 객체는 isLoggedIn 이 변경 될때마다 리액트에의해 업데이트됨 그리고 새로운 객체 새로운 컨텍스트 객체는 모든 리스닝 컴포넌트로 전달됨*/
+				onLogout: logoutHandler, /*AuthContext 에 wrapper 되어있는 곳에서 onLogout prop 을 사용 할 수있다*/
 			}}>
-				<MainHeader onLogout={logoutHandler}/>
+				<MainHeader/>
 				<main>
 					{!isLoggedIn && <Login onLogin={loginHandler}/>}
 					{isLoggedIn && <Home onLogout={logoutHandler}/>}
