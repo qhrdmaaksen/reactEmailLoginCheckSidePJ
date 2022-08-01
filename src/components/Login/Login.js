@@ -4,22 +4,23 @@ import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
 import Button from '../UI/Button/Button';
 import AuthContext from "../../Store/auth-context";
+import Input from "../UI/Input/Input";
 
 const emailReducer = (state, action) => { //최신 스냅샷 state, dispatch 된 action
 	if (action.type === 'USER_INPUT') {
 		return {value: action.val, isValid: action.val.includes('@')}
 	}
-	if(action.type === 'USER_BLUR'){
+	if (action.type === 'USER_BLUR') {
 		return {value: state.value, isValid: state.value.includes('@')}
 	}
-		return {value: '', isValid: false}
+	return {value: '', isValid: false}
 }
 
 const passwordReducer = (state, action) => {
-	if(action.type === 'USER_INPUT'){
+	if (action.type === 'USER_INPUT') {
 		return {value: action.val, isValid: action.val.trim().length > 6}
 	}
-	if (action.type === 'INPUT_BLUR'){
+	if (action.type === 'INPUT_BLUR') {
 		return {value: state.value, isValid: state.value.trim().length > 6}
 	}
 	return {value: '', isValid: false}
@@ -46,7 +47,7 @@ const Login = () => {
 	}, [])*/
 
 	// 객체 디스트럭쳐링으로 emailState 에서 isValid 속성을 가져왔고 유효성 검사를 하지않을땐 useEffect 가 실행되지않음
-	const {isValid: emailIsValid } = emailState;
+	const {isValid: emailIsValid} = emailState;
 	const {isValid: passwordIsValid} = passwordState;
 
 	useEffect(() => { // 다른 state 를 기준으로 state 를 update 하는 좋은 방법
@@ -109,35 +110,24 @@ const Login = () => {
 	return (
 			<Card className={classes.login}>
 				<form onSubmit={submitHandler}>
-					<div
-							className={`${classes.control} ${
-									emailState.isValid === false ? classes.invalid : ''
-							}`}
-					>
-						<label htmlFor="email">E-Mail</label>
-						<input
-								type="email"
-								id="email"
-								value={emailState.value}
-								onChange={emailChangeHandler}
-								onBlur={validateEmailHandler}
-						/>
-					</div>
-					<div
-							className={`${classes.control} ${
-									passwordState.isValid === false ? classes.invalid : ''
-							}`}
-					>
-						<label htmlFor="password">Password</label>
-						<input
-								type="password"
+					<Input
+							id="email"
+							type="email"
+							label="E-Mail"
+							isValid={emailIsValid}
+							value={emailState.value}
+							onChange={emailChangeHandler}
+							onBlur={validateEmailHandler}
+					/>
+						<Input
 								id="password"
+								type="password"
+								label="Password"
 								value={passwordState.value}
 								autoComplete="on"
 								onChange={passwordChangeHandler}
 								onBlur={validatePasswordHandler}
 						/>
-					</div>
 					<div className={classes.actions}>
 						<Button type="submit" className={classes.btn} disabled={!formIsValid}>
 							Login
