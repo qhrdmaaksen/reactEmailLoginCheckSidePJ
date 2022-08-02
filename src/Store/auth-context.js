@@ -10,19 +10,19 @@ const AuthContext = React.createContext({
 export const AuthContextProvider = (props) => {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	useEffect(() => {
-		const storedUserLoggedInInfomation = localStorage.getItem('isLoggedIn');
-		if (storedUserLoggedInInfomation === 'login') {
+		const storedUserLoggedInInformation = localStorage.getItem('isLoggedIn');
+		if (storedUserLoggedInInformation === 'login') {
 			setIsLoggedIn(true);
 		}
 	}, [])
 
 	const loginHandler = () => {
-		setIsLoggedIn(true)
 		localStorage.setItem('isLoggedIn', 'login');
+		setIsLoggedIn(true)
 	}
 	const logoutHandler = () => {
+		localStorage.removeItem('isLoggedIn');
 		setIsLoggedIn(false)
-		localStorage.setItem('isLogout', 'logout');
 	}
 	return (
 			<AuthContext.Provider

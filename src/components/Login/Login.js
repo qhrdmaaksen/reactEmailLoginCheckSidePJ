@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useReducer, useContext} from 'react';
+import React, {useState, useEffect, useReducer, useContext, useRef} from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
@@ -10,7 +10,7 @@ const emailReducer = (state, action) => { //최신 스냅샷 state, dispatch 된
 	if (action.type === 'USER_INPUT') {
 		return {value: action.val, isValid: action.val.includes('@')}
 	}
-	if (action.type === 'USER_BLUR') {
+	if (action.type === 'INPUT_BLUR') {
 		return {value: state.value, isValid: state.value.includes('@')}
 	}
 	return {value: '', isValid: false}
@@ -39,6 +39,9 @@ const Login = () => {
 
 	const contextLogInOut = useContext(AuthContext)
 
+	const emailInputRef = useRef()
+	const passwordInputRef = useRef()
+
 	/*useEffect(() => {
 		console.log('effect running')
 		return () => {
@@ -55,7 +58,7 @@ const Login = () => {
 			console.log('유효성 식별 검사')
 			//이메일에 @ 가 포함되어야하며 입력된 비밀번호가 정확한지 체크 및 입력 이메일또는 비번이 변경될때 업데이트
 			setFormIsValid( // setFormIsValid 가 useEffect 안에있기때문에 여전히 state 스냅샷을 참조한다
-					emailState.isValid && passwordState.isValid)
+					emailIsValid && passwordIsValid)
 		}, 500) // 0.5초 딜레이
 		return () => {
 			console.log('clean up')
@@ -70,22 +73,18 @@ const Login = () => {
 			val: event.target.value,
 		});
 
-		setFormIsValid(
+		/*setFormIsValid(
 				event.target.value.includes('@') && passwordState.isValid
-		)
+		)*/
 	};
 
 	const passwordChangeHandler = (event) => {
 		// 비밀번호가 변경될때 dispatchPassword 호출
-		dispatchPassword({
-			type: 'USER_INPUT',
-			val: event.target.value,
-		});
+		dispatchPassword({type: 'USER_INPUT',val: event.target.value,});
 
 		//비밀번호가 6자리 이상인지 @가 포함되어있는지
-		setFormIsValid(
-				event.target.value.trim().length > 6 && emailState.isValid
-		);
+		/*setFormIsValid(
+				event.target.value.trim().length > 6 && emailState.isValid);*/
 	};
 
 	const validateEmailHandler = () => {
@@ -98,13 +97,19 @@ const Login = () => {
 	const validatePasswordHandler = () => {
 		//setPasswordIsValid(passwordState.value.trim().length > 6);
 		dispatchPassword({
-			type: 'USER_BLUR',
+			type: 'INPUT_BLUR',
 		})
 	};
 
 	const submitHandler = (event) => {
 		event.preventDefault();
-		contextLogInOut.onLogin(emailState.value, passwordState.value);
+		if (formIsValid) {
+			contextLogInOut.onLogin(emailState.value, passwordState.value)
+		} else if (!emailIsValid) {
+			emailInputRef.current.focus();
+		} else {
+			passwordInputRef.current.focus();
+		}
 	};
 
 	return (
@@ -114,22 +119,24 @@ const Login = () => {
 							id="email"
 							type="email"
 							label="E-Mail"
+							ref={emailInputRef}
 							isValid={emailIsValid}
 							value={emailState.value}
 							onChange={emailChangeHandler}
 							onBlur={validateEmailHandler}
 					/>
-						<Input
-								id="password"
-								type="password"
-								label="Password"
-								value={passwordState.value}
-								autoComplete="on"
-								onChange={passwordChangeHandler}
-								onBlur={validatePasswordHandler}
-						/>
+					<Input
+							id="password"
+							type="password"
+							ref={passwordInputRef}
+							label="Password"
+							value={passwordState.value}
+							autoComplete="on"
+							onChange={passwordChangeHandler}
+							onBlur={validatePasswordHandler}
+					/>
 					<div className={classes.actions}>
-						<Button type="submit" className={classes.btn} disabled={!formIsValid}>
+						<Button type="submit" className={classes.btn}>
 							Login
 						</Button>
 					</div>
